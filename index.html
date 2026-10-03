@@ -57,6 +57,15 @@ main{padding:28px;max-width:1500px;width:100%}
 .footer{color:var(--muted);font-size:12px;margin-top:30px;padding-bottom:20px}
 @media(max-width:980px){.app{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}nav{grid-template-columns:repeat(4,1fr)}nav button{text-align:center;padding:9px 4px;font-size:12px}main{padding:18px}.grid{grid-template-columns:repeat(2,1fr)}.tool-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.hero{display:block}.hero .badge{margin-top:12px}.grid{grid-template-columns:1fr 1fr}.week-body{grid-template-columns:1fr}.tool-grid{grid-template-columns:1fr}.skill-row{grid-template-columns:110px 1fr 40px}.app aside{padding:16px}.brand small{max-width:260px}nav{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}nav button{font-size:11px}.hero h1{font-size:26px}}
+
+textarea{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.brand small,.kpi span,.pill,.box h3,.skill-row em,.footer,nav button{font-size:14px}
+.field{display:grid;gap:7px;margin:12px 0;font-size:14px}.field input,.field textarea,.field select{width:100%;min-width:0;background:#0c1427;color:var(--text);border:1px solid var(--line);padding:10px;border-radius:9px;font:inherit}.field textarea{min-height:80px;resize:vertical}
+.callout{border-left:3px solid var(--accent);padding:12px 16px;background:var(--panel2);border-radius:8px;line-height:1.7;margin-bottom:14px}
+.review{border-top:1px solid var(--line);padding-top:12px}.review summary{cursor:pointer;color:var(--accent);padding:8px 0}
+.skill-row{grid-template-columns:minmax(110px,1fr) minmax(150px,2fr)}
+.skill-row select{width:100%;background:var(--panel2);color:var(--text);padding:10px;border:1px solid var(--line);border-radius:8px}
+@media(max-width:640px){nav{grid-template-columns:repeat(3,minmax(0,1fr))}nav button{font-size:14px}.hero h1{font-size:25px}.grid{grid-template-columns:1fr 1fr}.badge{white-space:normal}.week summary{align-items:flex-start}.skill-row{grid-template-columns:1fr}main{padding:14px}.card{padding:14px}.kpi b{font-size:24px}}
 </style>
 </head>
 <body>
@@ -78,14 +87,14 @@ main{padding:28px;max-width:1500px;width:100%}
 <main>
   <section id="overview" class="view">
     <div class="hero">
-      <div><h1>Ray 的全端學習控制台</h1><p>不是看過就算會：每週都有「必學、必做、週測、交付物、及格門檻、補救」。</p></div>
-      <div class="badge">目前階段：<strong id="phaseNow">JS 基礎補洞</strong></div>
+      <div><h1>Ray 的全端學習控制台</h1><p>開課前先準備，開課後每週留下作品、驗收與補強紀錄。</p></div>
+      <div class="badge">目前階段：<strong id="phaseNow">開課前準備</strong></div>
     </div>
     <div class="grid">
       <div class="card kpi"><span>整體完成率</span><b id="overallPct">0%</b><div class="progress"><i id="overallBar" style="width:0%"></i></div></div>
-      <div class="card kpi"><span>目前週次</span><b id="weekNow">W1</b><small id="weekDate" style="color:var(--muted)"></small></div>
+      <div class="card kpi"><span>目前週次</span><b id="weekNow">準備期</b><small id="weekDate" style="color:var(--muted)"></small></div>
       <div class="card kpi"><span>本週任務完成</span><b id="weekPct">0%</b><span id="weekCount">0 / 0</span></div>
-      <div class="card kpi"><span>關鍵弱項</span><b style="font-size:20px">Loop / Array / Async / DevTools</b><span>基線測驗結果</span></div>
+      <div class="card kpi"><span>本階段重點</span><b style="font-size:20px" id="focusText">準備學習環境</b><span>能力以實作與驗收確認</span></div>
     </div>
 
     <div class="section">
@@ -105,7 +114,7 @@ main{padding:28px;max-width:1500px;width:100%}
   </section>
 
   <section id="weeks" class="view hidden">
-    <div class="hero"><div><h1>26 週課程</h1><p>每一週都要能交出東西，不能只「看懂」。</p></div></div>
+    <div class="hero"><div><h1>26 週課程</h1><p>個人補強計畫，非官方授課表；依老師實際進度調整。課程期間 2026/10/06–2027/04/02，最後一週截至結訓日。</p></div></div>
     <div class="controls">
       <input id="search" placeholder="搜尋：async、JOIN、Laravel…">
       <select id="phaseFilter"><option value="">全部階段</option><option>JS 基礎</option><option>前端實戰</option><option>資料庫 / PHP</option><option>Laravel</option><option>整合</option><option>最終專案</option></select>
@@ -124,7 +133,7 @@ main{padding:28px;max-width:1500px;width:100%}
   </section>
 
   <section id="skills" class="view hidden">
-    <div class="hero"><div><h1>技能雷達</h1><p>綠色不是「看得懂」，而是能自己寫、自己除錯。</p></div></div>
+    <div class="hero"><div><h1>技能雷達</h1><p>依你實際操作自評；尚未驗收的能力不預填分數。</p></div></div>
     <div class="card" id="skillsBox"></div>
   </section>
 
@@ -140,13 +149,13 @@ main{padding:28px;max-width:1500px;width:100%}
       <div class="task"><b>30 分鐘</b><span>今天新概念：只學一個主題，邊看邊操作。</span></div>
       <div class="task"><b>30 分鐘</b><span>實作：做題或小功能，先自己 debug 20 分鐘。</span></div>
       <div class="task"><b>10 分鐘</b><span>Git commit + README + Anki 3–5 張。</span></div>
-      <div class="task"><b>週五</b><span>不看筆記重做本週核心題，70% 以下補救，不急著往下。</span></div>
+      <div class="task"><b>週五</b><span>不看筆記重做本週核心題，未達各週及格標準就補救，不急著往下。</span></div>
       <div class="task"><b>週末</b><span>2–3 小時 Mini Project，必須可操作。</span></div>
     </div>
   </section>
 
   <section id="notes" class="view hidden">
-    <div class="hero"><div><h1>學習筆記</h1><p>存在瀏覽器 LocalStorage，不會因重新整理消失。</p></div></div>
+    <div class="hero"><div><h1>學習筆記</h1><p>筆記只存在目前裝置的瀏覽器；請定期到「進度」匯出備份。</p></div></div>
     <textarea class="note" id="notesBox" placeholder="今天學到什麼？哪裡卡住？錯誤訊息是什麼？"></textarea>
   </section>
 
@@ -155,7 +164,7 @@ main{padding:28px;max-width:1500px;width:100%}
     <div class="card">
       <p>整體進度：<strong id="progressBig">0%</strong></p>
       <div class="progress"><i id="progressBigBar" style="width:0%"></i></div>
-      <div style="margin-top:18px"><button class="btn secondary" id="resetProgress">重設全部進度</button></div>
+      <div class="controls" style="margin-top:18px"><button class="btn" id="exportData">匯出備份</button><label class="btn secondary">匯入備份<input type="file" id="importData" accept=".json" hidden></label><button class="btn secondary" id="resetProgress">重設課程任務</button></div>
     </div>
   </section>
 
@@ -170,7 +179,7 @@ main{padding:28px;max-width:1500px;width:100%}
     </div>
   </section>
 
-  <div class="footer">Ray Learning OS · Progress saved locally in your browser.</div>
+  <div class="footer">Ray Learning OS · 紀錄僅存在此瀏覽器，不會自動同步 GitHub 或其他裝置。請定期匯出備份。<span id="saveStatus" role="status"></span></div>
 </main>
 </div>
 <script>
@@ -212,10 +221,6 @@ const toolsData=[
 ];
 
 function weekStart(i){let d=new Date(start);d.setDate(d.getDate()+i*7);return d}
-function currentWeek(){
- const now=new Date();let n=Math.floor((now-start)/604800000)+1;
- return Math.max(1,Math.min(26,n));
-}
 function key(w,i){return 'ray-task-'+w+'-'+i}
 function buildTasks(w){
  const x=weeks[w-1];
@@ -234,7 +239,7 @@ function renderWeeks(){
   const tasks=buildTasks(idx+1);
   const done=tasks.filter((_,i)=>localStorage.getItem(key(idx+1,i))==='1').length;
   d.innerHTML=`
-   <summary><div><b>${w.t}</b><div class="meta"><span class="pill">${w.p}</span><span class="pill">${ws.toLocaleDateString('zh-TW')}–${we.toLocaleDateString('zh-TW')}</span><span class="pill">${done}/${tasks.length}</span></div></div><span>＋</span></summary>
+   <summary><div><b>${w.t}</b><div class="meta"><span class="pill">${w.p}</span><span class="pill">${weekRange(idx)}</span><span class="pill">${done}/${tasks.length}</span></div></div><span>＋</span></summary>
    <div class="week-body">
     <div class="box"><h3>本週必學</h3><ul>${w.topics.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
     <div class="box"><h3>必做小功能</h3><div>${w.build}</div></div>
@@ -252,52 +257,6 @@ function renderWeeks(){
    localStorage.setItem(e.target.dataset.task,e.target.checked?'1':'0'); updateStats(); renderWeeks();
  }));
 }
-function updateStats(){
- let total=0,done=0;
- weeks.forEach((_,wi)=>buildTasks(wi+1).forEach((_,i)=>{total++;if(localStorage.getItem(key(wi+1,i))==='1')done++}));
- const pct=Math.round(done/total*100);
- ['overallPct','progressBig'].forEach(id=>document.getElementById(id).textContent=pct+'%');
- ['overallBar','progressBigBar'].forEach(id=>document.getElementById(id).style.width=pct+'%');
- const cw=currentWeek(), tasks=buildTasks(cw), wd=tasks.filter((_,i)=>localStorage.getItem(key(cw,i))==='1').length;
- document.getElementById('weekNow').textContent='W'+cw;
- document.getElementById('weekPct').textContent=Math.round(wd/tasks.length*100)+'%';
- document.getElementById('weekCount').textContent=wd+' / '+tasks.length;
- const ws=weekStart(cw-1),we=new Date(ws);we.setDate(we.getDate()+6);
- document.getElementById('weekDate').textContent=ws.toLocaleDateString('zh-TW')+'–'+we.toLocaleDateString('zh-TW');
- document.getElementById('phaseNow').textContent=weeks[cw-1].p;
- renderToday();
-}
-function renderToday(){
- const cw=currentWeek(),tasks=buildTasks(cw),day=new Date().getDay();
- const labels=['週日 Mini Project','週一 基礎複習','週二 新概念','週三 實作','週四 Debug','週五 週測','週六 Mini Project'];
- const picks=day===5?[0,1,2,3,4]:day===0||day===6?[1,2,4]:[0,1,2];
- const box=document.getElementById('todayTasks');
- box.innerHTML='<b>'+labels[day]+' · W'+cw+'</b>'+picks.map(i=>`<label class="task"><input type="checkbox" data-today="${key(cw,i)}" ${localStorage.getItem(key(cw,i))==='1'?'checked':''}><span>${tasks[i]}</span></label>`).join('');
- document.querySelectorAll('[data-today]').forEach(el=>el.addEventListener('change',e=>{localStorage.setItem(e.target.dataset.today,e.target.checked?'1':'0');updateStats();renderWeeks()}));
-}
-function renderOutcomes(){
- const box=document.getElementById('outcomeGrid');
- box.innerHTML=weeks.map((w,idx)=>{
-  const n=String(idx+1).padStart(2,'0');
-  const done=localStorage.getItem('ray-outcome-'+n)==='1';
-  return `<div class="card outcome-card">
-    <div><span class="status-dot ${done?'done':''}"></span><b>${w.t}</b></div>
-    <div style="color:var(--muted);font-size:13px">必做：${w.build}</div>
-    <label class="task"><input type="checkbox" data-outcome="${n}" ${done?'checked':''}><span>本週成果已 commit / push</span></label>
-    <div class="links">
-      <a class="btn secondary" target="_blank" rel="noopener" href="https://github.com/laypan/ray-learning-os/tree/main/learning/week${n}">成果資料夾</a>
-      <a class="btn secondary" target="_blank" rel="noopener" href="https://github.com/laypan/ray-learning-os/blob/main/learning/week${n}/README.md">README</a>
-    </div>
-  </div>`;
- }).join('');
- document.querySelectorAll('[data-outcome]').forEach(el=>el.addEventListener('change',e=>{
-  localStorage.setItem('ray-outcome-'+e.target.dataset.outcome,e.target.checked?'1':'0');
-  renderOutcomes();
- }));
-}
-function renderSkills(){
- document.getElementById('skillsBox').innerHTML=skillData.map(([n,v])=>`<div class="skill-row"><span>${n}</span><div class="progress"><i style="width:${v}%"></i></div><em>${v}%</em></div>`).join('');
-}
 function renderTools(){
  document.getElementById('toolGrid').innerHTML=toolsData.map(([n,d])=>`<div class="card tool"><div class="tool-icon">${n.split(' ').map(s=>s[0]).join('').slice(0,2)}</div><div><b>${n}</b><div style="color:var(--muted);font-size:13px;margin-top:4px">${d}</div></div></div>`).join('');
 }
@@ -309,8 +268,98 @@ document.getElementById('search').addEventListener('input',renderWeeks);
 document.getElementById('phaseFilter').addEventListener('change',renderWeeks);
 document.getElementById('expandAll').onclick=()=>document.querySelectorAll('.week').forEach(x=>x.open=true);
 document.getElementById('notesBox').value=localStorage.getItem('ray-notes')||'';
-document.getElementById('notesBox').addEventListener('input',e=>localStorage.setItem('ray-notes',e.target.value));
+
 document.getElementById('resetProgress').onclick=()=>{if(confirm('確定重設全部進度？')){Object.keys(localStorage).filter(k=>k.startsWith('ray-task-')).forEach(k=>localStorage.removeItem(k));updateStats();renderWeeks()}};
+
+/* Course calendar is based on Taipei dates; preparation never counts as W1. */
+const courseStart=Date.UTC(2026,9,6),courseEnd=Date.UTC(2027,3,2),DAY=86400000;
+function taipeiDay(now=new Date()){
+ const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
+ const v=type=>Number(p.find(x=>x.type===type).value);
+ return Date.UTC(v('year'),v('month')-1,v('day'));
+}
+function courseState(now=new Date()){
+ const d=taipeiDay(now);
+ return {before:d<courseStart,after:d>courseEnd,week:d<courseStart?0:Math.min(26,Math.floor((d-courseStart)/(7*DAY))+1),days:Math.max(0,Math.round((courseStart-d)/DAY))};
+}
+function dateLabel(ms){return new Intl.DateTimeFormat('zh-TW',{timeZone:'UTC',year:'numeric',month:'numeric',day:'numeric'}).format(new Date(ms));}
+function weekRange(i){return dateLabel(courseStart+i*7*DAY)+'–'+dateLabel(Math.min(courseEnd,courseStart+(i*7+6)*DAY));}
+function currentWeek(){return courseState().week;}
+const prepTasks=[
+ '確認 VS Code 能建立並開啟 HTML / JavaScript 檔案',
+ '開啟瀏覽器 Console，執行一行 console.log',
+ '準備 GitHub 與本機專案資料夾，確認提交方式',
+ '整理老師課表與講義，記錄需要補強的主題',
+ '安排每週學習時間，完成一次進度備份'
+];
+function safeRead(k,fallback=''){try{return localStorage.getItem(k)??fallback}catch{return fallback}}
+function save(k,v){try{localStorage.setItem(k,v);document.getElementById('saveStatus').textContent=' · 已儲存於此裝置';return true}catch{document.getElementById('saveStatus').textContent=' · 儲存失敗，請立即匯出備份';return false}}
+function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function updateStats(){
+ let total=0,done=0;
+ weeks.forEach((_,wi)=>buildTasks(wi+1).forEach((_,i)=>{total++;if(safeRead(key(wi+1,i))==='1')done++}));
+ const pct=Math.round(done/total*100);
+ ['overallPct','progressBig'].forEach(id=>document.getElementById(id).textContent=pct+'%');
+ ['overallBar','progressBigBar'].forEach(id=>document.getElementById(id).style.width=pct+'%');
+ const state=courseState(),cw=state.week;
+ const tasks=state.before?prepTasks:buildTasks(cw);
+ const wd=tasks.filter((_,i)=>safeRead(state.before?'ray-prep-'+i:key(cw,i))==='1').length;
+ document.getElementById('weekNow').textContent=state.before?'準備期':state.after?'已結訓':'W'+cw;
+ document.getElementById('weekDate').textContent=state.before?'距 10/06 開課還有 '+state.days+' 天':weekRange(cw-1);
+ document.getElementById('phaseNow').textContent=state.before?'開課前準備':state.after?'成果整理與補強':weeks[cw-1].p;
+ document.getElementById('focusText').textContent=state.before?'環境、時間與課表':state.after?'整理作品與補強弱項':weeks[cw-1].build;
+ document.getElementById('weekPct').textContent=Math.round(wd/tasks.length*100)+'%';
+ document.getElementById('weekCount').textContent=(state.before?'準備清單 ':'課程任務 ')+wd+' / '+tasks.length;
+ renderToday();
+}
+function renderToday(){
+ const state=courseState(),cw=state.week,box=document.getElementById('todayTasks');
+ const tasks=state.before?prepTasks:buildTasks(cw);
+ box.innerHTML=(state.before?'<div class="callout"><b>正式課程尚未開始</b><br>10/06 起才進入 W1。現在的預習不會增加正式課程完成率；課前練習可以記在筆記中。</div>':'<div class="callout"><b>'+ (state.after?'結訓後檢查':'W'+cw+' 本週重點')+'</b><br>'+esc(weeks[cw-1].build)+'</div>')+
+ tasks.map((t,i)=>{const k=state.before?'ray-prep-'+i:key(cw,i);return '<label class="task"><input type="checkbox" data-current="'+k+'" '+(safeRead(k)==='1'?'checked':'')+'><span>'+esc(t)+'</span></label>'}).join('')+
+ '<p style="color:var(--muted);margin:8px 0 0">勾選代表任務完成；測驗結果與作品證據請另記於「學習成果」。</p>';
+ box.querySelectorAll('[data-current]').forEach(el=>el.onchange=()=>{save(el.dataset.current,el.checked?'1':'0');updateStats();renderWeeks()});
+}
+function renderSkills(){
+ const options=['尚未評估','需要提示才能完成','可獨立完成基礎題','可解釋並自行除錯'];
+ document.getElementById('skillsBox').innerHTML='<div class="callout">能力自評不是正式測驗分數。用作品與口頭解釋確認，再調整評估。</div>'+skillData.map(([n],i)=>'<label class="skill-row"><span>'+esc(n)+'</span><select data-skill="'+i+'">'+options.map((o,j)=>'<option value="'+j+'" '+(safeRead('ray-skill-'+i,'0')===String(j)?'selected':'')+'>'+o+'</option>').join('')+'</select></label>').join('');
+ document.querySelectorAll('[data-skill]').forEach(el=>el.onchange=()=>save('ray-skill-'+el.dataset.skill,el.value));
+}
+function renderOutcomes(){
+ const fields=[['demo','作品 / Demo 連結','url'],['commit','Commit 連結','url'],['score','測驗分數（0–100，無分數可留白）','number'],['review','驗收結果','select'],['learned','我能獨立完成什麼','textarea'],['debug','遇到的錯誤與解決方式','textarea'],['next','下一步補強 / 老師實際授課進度','textarea']];
+ document.getElementById('outcomeGrid').innerHTML=weeks.map((w,i)=>{
+ const n=String(i+1).padStart(2,'0'),done=safeRead('ray-outcome-'+n)==='1';
+ return '<article class="card outcome-card"><div><span class="pill">W'+(i+1)+'</span> <b>'+esc(w.t.split('｜')[1])+'</b></div><span style="color:var(--muted);font-size:14px">'+weekRange(i)+'</span><p style="margin:0">'+esc(w.build)+'</p><div class="box"><b>驗收標準</b><p style="margin:6px 0">'+esc(w.pass)+'</p></div><label class="task"><input type="checkbox" data-outcome="'+n+'" '+(done?'checked':'')+'><span>本週成果已 commit / push（自行確認）</span></label><details class="review"><summary>填寫作品與驗收紀錄</summary>'+fields.map(([f,label,type])=>{
+ const k='ray-evidence-'+n+'-'+f,v=safeRead(k);
+ let control=type==='textarea'?'<textarea data-record="'+k+'">'+esc(v)+'</textarea>':type==='select'?'<select data-record="'+k+'">'+[['','尚未驗收'],['practice','練習中'],['remediate','需補強'],['passed','已通過']].map(([a,b])=>'<option value="'+a+'" '+(v===a?'selected':'')+'>'+b+'</option>').join('')+'</select>':'<input type="'+type+'" '+(type==='number'?'min="0" max="100" step="1"':'placeholder="https://"')+' data-record="'+k+'" value="'+esc(v)+'">';
+ return '<label class="field">'+label+control+'</label>';
+ }).join('')+'</details><div class="links"><a class="btn secondary" target="_blank" rel="noopener" href="https://github.com/laypan/ray-learning-os/tree/main/learning/week'+n+'">成果資料夾</a><a class="btn secondary" target="_blank" rel="noopener" href="https://github.com/laypan/ray-learning-os/blob/main/learning/week'+n+'/README.md">README</a></div></article>';
+ }).join('');
+ document.querySelectorAll('[data-outcome]').forEach(el=>el.onchange=()=>save('ray-outcome-'+el.dataset.outcome,el.checked?'1':'0'));
+ document.querySelectorAll('[data-record]').forEach(el=>el.oninput=()=>{if(el.type==='number'&&!el.checkValidity())return;save(el.dataset.record,el.value)});
+}
+function exportBackup(){
+ const data={};Object.keys(localStorage).filter(k=>k.startsWith('ray-')).forEach(k=>data[k]=localStorage.getItem(k));
+ const blob=new Blob([JSON.stringify({app:'ray-learning-os',version:1,exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ray-learning-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+document.getElementById('exportData').onclick=exportBackup;
+document.getElementById('importData').onchange=async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  if(file.size>2000000)throw Error('檔案過大');
+  const obj=JSON.parse(await file.text());
+  if(obj.app!=='ray-learning-os'||obj.version!==1||!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw Error('不是有效的學習備份');
+  const entries=Object.entries(obj.data);
+  if(entries.some(([k,v])=>!/^ray-(task-|outcome-|notes$|prep-|skill-|evidence-)/.test(k)||typeof v!=='string'))throw Error('備份欄位格式不符');
+  if(!confirm('匯入將覆蓋備份中同名的紀錄，其餘紀錄保留。建議先匯出目前資料。繼續？'))return;
+  for(const [k,v]of entries){if(!save(k,v))throw Error('儲存空間不足，部分資料可能已匯入');}
+  document.getElementById('notesBox').value=safeRead('ray-notes');
+  renderWeeks();renderOutcomes();renderSkills();updateStats();alert('備份已匯入');
+ }catch(err){alert('匯入失敗：'+err.message)}finally{e.target.value=''}
+};
+document.getElementById('notesBox').oninput=e=>save('ray-notes',e.target.value);
+
 renderWeeks();renderOutcomes();renderSkills();renderTools();updateStats();
 </script>
 </body>
