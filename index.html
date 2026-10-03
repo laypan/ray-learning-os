@@ -66,6 +66,7 @@ textarea{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,t
 .skill-row{grid-template-columns:minmax(110px,1fr) minmax(150px,2fr)}
 .skill-row select{width:100%;background:var(--panel2);color:var(--text);padding:10px;border:1px solid var(--line);border-radius:8px}
 @media(max-width:640px){nav{grid-template-columns:repeat(3,minmax(0,1fr))}nav button{font-size:14px}.hero h1{font-size:25px}.grid{grid-template-columns:1fr 1fr}.badge{white-space:normal}.week summary{align-items:flex-start}.skill-row{grid-template-columns:1fr}main{padding:14px}.card{padding:14px}.kpi b{font-size:24px}}
+button:disabled{opacity:.5;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -91,14 +92,18 @@ textarea{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,t
       <div class="badge">目前階段：<strong id="phaseNow">開課前準備</strong></div>
     </div>
     <div class="grid">
-      <div class="card kpi"><span>整體完成率</span><b id="overallPct">0%</b><div class="progress"><i id="overallBar" style="width:0%"></i></div></div>
-      <div class="card kpi"><span>目前週次</span><b id="weekNow">準備期</b><small id="weekDate" style="color:var(--muted)"></small></div>
-      <div class="card kpi"><span>本週任務完成</span><b id="weekPct">0%</b><span id="weekCount">0 / 0</span></div>
+      <div class="card kpi"><span>任務完成率</span><b id="overallPct">0%</b><div class="progress"><i id="overallBar" style="width:0%"></i></div></div>
+      <div class="card kpi"><span>行事曆週次</span><b id="weekNow">準備期</b><small id="weekDate" style="color:var(--muted)"></small></div>
+      <div class="card kpi"><span>目前學習單元任務</span><b id="weekPct">0%</b><span id="weekCount">0 / 0</span></div>
       <div class="card kpi"><span>本階段重點</span><b style="font-size:20px" id="focusText">準備學習環境</b><span>能力以實作與驗收確認</span></div>
     </div>
 
     <div class="section">
-      <h2>今天要做什麼</h2>
+      <h2>目前學習單元</h2><div class="card" style="margin-bottom:14px">
+<label class="field">選擇正在學習的單元<select id="activeUnit"></select></label>
+<p id="unitStatus" class="callout"></p><button class="btn secondary" id="nextUnit">前往下一單元</button>
+<p style="color:var(--muted)">日期往前走，學習單元不會自動跳級。先完成驗收，再進入下一單元；老師作業可直接作為成果。</p></div>
+<h2>本次學習任務</h2>
       <div class="card today-list" id="todayTasks"></div>
     </div>
 
@@ -143,15 +148,15 @@ textarea{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,t
   </section>
 
   <section id="routine" class="view hidden">
-    <div class="hero"><div><h1>每日 60–90 分鐘流程</h1><p>上課之外固定跑一輪，建立可重複的學習節奏。</p></div></div>
+    <div class="hero"><div><h1>彈性學習節奏</h1><p>上課之外固定跑一輪，建立可重複的學習節奏。</p></div></div>
     <div class="card">
-      <div class="task"><b>20 分鐘</b><span>回想昨天內容，不看答案重寫。</span></div>
-      <div class="task"><b>30 分鐘</b><span>今天新概念：只學一個主題，邊看邊操作。</span></div>
-      <div class="task"><b>30 分鐘</b><span>實作：做題或小功能，先自己 debug 20 分鐘。</span></div>
-      <div class="task"><b>10 分鐘</b><span>Git commit + README + Anki 3–5 張。</span></div>
-      <div class="task"><b>週五</b><span>不看筆記重做本週核心題，未達各週及格標準就補救，不急著往下。</span></div>
-      <div class="task"><b>週末</b><span>2–3 小時 Mini Project，必須可操作。</span></div>
-    </div>
+<div class="task"><b>正常日 · 60 分鐘</b><span>10 分鐘回想 → 15 分鐘示範與跟做 → 25 分鐘獨立實作 → 10 分鐘記錄與提交。</span></div>
+<div class="task"><b>忙碌日 · 20 分鐘</b><span>5 分鐘回想 → 10 分鐘修改一題或修一個錯誤 → 5 分鐘記錄；當天不加新觀念。</span></div>
+<div class="task"><b>每週緩衝</b><span>至少保留一個原定學習時段補強或休息，不另加時數。卡關時先刪減延伸題。</span></div>
+<div class="task"><b>單元結束驗收</b><span>獨立寫、改需求、找錯誤、說明原因。隔天換題再做；不只看選擇題分數。</span></div>
+<div class="task"><b>週末 · 2–3 小時</b><span>延續同一個作品，補一個功能；老師作業符合目標即可採用，不必另做一份。</span></div>
+<div class="task"><b>教學節奏</b><span>示範 → 跟做 → 改條件 → 獨立完成 → 隔天複習。先理解題意；有嘗試仍卡住再請 AI 提示。</span></div>
+</div>
   </section>
 
   <section id="notes" class="view hidden">
@@ -161,8 +166,8 @@ textarea{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,t
 
   <section id="progress" class="view hidden">
     <div class="hero"><div><h1>進度管理</h1><p>勾選任務會自動統計。你可以隨時重設。</p></div></div>
-    <div class="card">
-      <p>整體進度：<strong id="progressBig">0%</strong></p>
+    <div class="grid" style="margin-bottom:14px"><div class="card kpi"><span>驗收通過</span><b id="passedCount">0 / 26</b><span>四項能力確認 + 通過狀態</span></div><div class="card kpi"><span>作品提交</span><b id="submittedCount">0 / 26</b><span>提交勾選 + 有效 Commit 連結</span></div></div><div class="card">
+      <p>任務完成：<strong id="progressBig">0%</strong></p>
       <div class="progress"><i id="progressBigBar" style="width:0%"></i></div>
       <div class="controls" style="margin-top:18px"><button class="btn" id="exportData">匯出備份</button><label class="btn secondary">匯入備份<input type="file" id="importData" accept=".json" hidden></label><button class="btn secondary" id="resetProgress">重設課程任務</button></div>
     </div>
@@ -171,12 +176,12 @@ textarea{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,t
   <section id="rules" class="view hidden">
     <div class="hero"><div><h1>AI 使用規則</h1><p>AI 可以加速，但不能替你把核心能力挖空。</p></div></div>
     <div class="card">
-      <div class="task"><b>10–11 月</b><span>核心 JS 題先自己 20 分鐘；第一次只准提示；第二次還不會才看解法；看完要關掉重寫。</span></div>
-      <div class="task"><b>12 月</b><span>AI 可協助 API 錯誤，但 fetch / await / response.json() 必須自己能改。</span></div>
-      <div class="task"><b>1–2 月</b><span>後端可讓 AI 生 boilerplate，但你要能說明 Request → Controller → Model → DB → Response。</span></div>
-      <div class="task"><b>3 月以後</b><span>進入工作模式：AI/Copilot 可大量協助，但需求、架構、review、debug 由你負責。</span></div>
-      <div class="task"><b>禁止</b><span>把不懂的完整解答直接貼上後宣告完成。</span></div>
-    </div>
+<div class="task"><b>JS 基礎</b><span>先自行拆題並嘗試，卡住先要提示；看過解法後關掉重寫，隔天再驗收。Teaching Material Builder 帶學，Production Debugger 協助定位問題。</span></div>
+<div class="task"><b>DOM / API</b><span>事件、fetch 與資料處理先自己寫；AI 幫忙 review。進入 API 單元就使用 API Integration Planner，不用等月份。</span></div>
+<div class="task"><b>PHP / Laravel</b><span>AI 可協助樣板，但要自己解釋請求、驗證、資料庫與回應；SQL 與權限判斷必須能修改。</span></div>
+<div class="task"><b>整合與作品</b><span>Requirements Analyst 拆需求，Design MD Assistant 協助介面，PR &amp; Code Review Assistant 檢查程式；理解後才接受修改。</span></div>
+<div class="task"><b>每週回顧</b><span>使用 Project Status Manager 整理已完成、卡點、下週必做；依驗收與老師進度調整，不按日期自動放寬 AI 使用。</span></div>
+</div>
   </section>
 
   <div class="footer">Ray Learning OS · 紀錄僅存在此瀏覽器，不會自動同步 GitHub 或其他裝置。請定期匯出備份。<span id="saveStatus" role="status"></span></div>
@@ -188,7 +193,7 @@ const weeks=[
 {p:'JS 基礎',t:'W1｜執行流程、變數、運算子、Console',topics:['let / const','型別與轉型','比較與邏輯運算','if / else 複習','Console 基本操作'],build:'價格 / 折扣 / 登入判斷練習',dev:'Console：log、table、error；學會讀紅字',test:'10 題基礎題 + 1 題折扣計算',pass:'80% 且能口頭解釋變數如何改變',fix:'重做錯題，隔天不看答案再測一次',github:'week01/ + README',ai:'核心邏輯禁止直接要完整答案'},
 {p:'JS 基礎',t:'W2｜Loop、Array Index、length',topics:['for / while','0-based index','length','累加器','遍歷陣列'],build:'購物車總額 + 最大值搜尋',dev:'Breakpoint / Watch 觀察 i 與 total',test:'手算 3 段 loop + 寫 2 段迴圈',pass:'80% 且不再把 i 當成值',fix:'畫表格追蹤 i / value / total',github:'week02/',ai:'for 題先手寫 20 分鐘'},
 {p:'JS 基礎',t:'W3｜Function、Parameter、Return、Scope',topics:['function','參數與引數','return 控制流程','scope','pure function 概念'],build:'折扣計算器模組',dev:'Step into / Step over 看 return',test:'5 題函式輸出 + 2 題自己寫',pass:'能說出 return 後為何不再執行',fix:'把函式流程畫箭頭再重寫',github:'week03/',ai:'禁止直接生核心 function'},
-{p:'JS 基礎',t:'W4｜Object、Array Methods',topics:['Object','push/pop','find','filter','map','some/every'],build:'產品搜尋 / 篩選 / 排序',dev:'Console.table 比較處理前後資料',test:'map/filter/find 各 2 題',pass:'能自行選對 method',fix:'同一資料用 loop 與 method 各寫一次',github:'week04/',ai:'可提示 method，不可直接給整段'},
+{p:'JS 基礎',t:'W4｜Object、Array Methods',topics:['Object','push/pop','find','filter','map','some/every'],build:'產品搜尋 / 篩選（排序為延伸）',dev:'Console.table 比較處理前後資料',test:'map/filter/find 各 2 題',pass:'能自行選對 method',fix:'同一資料用 loop 與 method 各寫一次',github:'week04/',ai:'可提示 method，不可直接給整段'},
 {p:'前端實戰',t:'W5｜DOM、Event、Form',topics:['querySelector','事件物件','submit','表單驗證','事件委派'],build:'Todo v1 / 會員表單',dev:'Elements + event listener',test:'從空白頁完成表單互動',pass:'可自己綁定事件、取值、顯示錯誤',fix:'拆成 selector→event→data→render',github:'week05/',ai:'HTML/CSS 可幫，JS 核心自己寫'},
 {p:'前端實戰',t:'W6｜LocalStorage、JSON、CRUD UI',topics:['JSON.stringify/parse','localStorage','Create/Read/Update/Delete','render pattern'],build:'Todo v2 / 聯絡人管理',dev:'Application → Local Storage',test:'重整後資料仍存在',pass:'可完整做新增/修改/刪除',fix:'先寫資料層再寫 UI',github:'week06/',ai:'可協助 CSS，資料流程自己寫'},
 {p:'前端實戰',t:'W7｜Promise、Async/Await、Try/Catch',topics:['同步 vs 非同步','Promise','then/catch/finally','async/await','try/catch'],build:'模擬非同步載入器',dev:'Pause on exceptions',test:'解釋 await 拿掉會怎樣',pass:'能把 then 版改成 async/await',fix:'畫時間線 + 重寫兩種版本',github:'week07/',ai:'可解釋錯誤，不代寫 async 核心'},
@@ -196,12 +201,12 @@ const weeks=[
 {p:'資料庫 / PHP',t:'W9｜MySQL 基礎與 CRUD SQL',topics:['Table/Row/Column','資料型別','Primary Key','SELECT','INSERT/UPDATE/DELETE'],build:'會員資料表 + CRUD SQL',dev:'用 DB 工具觀察資料變化',test:'寫 8 條 SQL',pass:'CRUD 正確且知道 PK 用途',fix:'每條 SQL 手打一遍',github:'week09/sql/',ai:'可解釋，不直接包辦 SQL'},
 {p:'資料庫 / PHP',t:'W10｜WHERE、LIKE、ORDER、GROUP',topics:['WHERE','LIKE/IN/BETWEEN','ORDER BY','LIMIT','COUNT/SUM/AVG','GROUP BY/HAVING'],build:'查詢報表',dev:'比較 query result',test:'條件查詢 + 聚合 8 題',pass:'80% 以上',fix:'先寫自然語言再轉 SQL',github:'week10/sql/',ai:'可出題，不直接給答案'},
 {p:'資料庫 / PHP',t:'W11｜JOIN、FK、Index、關聯',topics:['一對多','Foreign Key','INNER JOIN','LEFT JOIN','Index 基本概念'],build:'users + orders schema',dev:'檢查 JOIN 結果筆數',test:'3 題 JOIN + 畫 ERD',pass:'能解釋 INNER vs LEFT',fix:'用小表手算 JOIN',github:'week11/',ai:'ERD 可協助檢查'},
-{p:'資料庫 / PHP',t:'W12｜PHP 基礎、Form、PDO',topics:['PHP syntax','array/function','GET/POST','validation','PDO connect'],build:'表單寫入 MySQL',dev:'看 request payload + PHP error',test:'完成新增資料流程',pass:'能說明表單如何進 DB',fix:'切成 request→validate→DB',github:'week12/',ai:'樣板可幫，資料流程需理解'},
+{p:'資料庫 / PHP',t:'W12｜PHP 基礎、Form、PDO',topics:['PHP syntax','array/function','GET/POST','validation','PDO connect'],build:'PHP 表單接收與回應（資料庫寫入於 U13 完成）',dev:'看 request payload + PHP error',test:'完成表單送出與 PHP 回應',pass:'能說明表單資料如何送到 PHP',fix:'切成 request→validate→DB',github:'week12/',ai:'樣板可幫，資料流程需理解'},
 {p:'資料庫 / PHP',t:'W13｜PHP + MySQL CRUD、安全',topics:['PDO prepared statements','CRUD','SQL Injection','XSS 基礎','輸入驗證'],build:'會員管理 CRUD',dev:'Network + server error',test:'CRUD 四功能全過',pass:'不可用字串拼接 SQL',fix:'全部改 prepared statement',github:'week13/',ai:'可生 boilerplate，但要逐段解釋'},
 {p:'資料庫 / PHP',t:'W14｜Session、Login、Auth',topics:['session','password_hash','password_verify','登入狀態','權限檢查'],build:'註冊 / 登入 / 登出',dev:'Cookie / Session 檢查',test:'未登入不能進管理頁',pass:'Auth flow 可口述',fix:'畫登入流程圖',github:'week14/',ai:'可以協助安全檢查'},
 {p:'資料庫 / PHP',t:'W15｜PHP REST API',topics:['JSON response','REST endpoint','status code','CORS 基礎','validation'],build:'users REST API',dev:'用 Network 驗證 status',test:'四種 method 實作',pass:'前端 fetch 可接 API',fix:'先測 endpoint 再接 UI',github:'week15/',ai:'可幫測試案例'},
 {p:'資料庫 / PHP',t:'W16｜OOP、Composer、MVC',topics:['class/object','namespace 基本','Composer','MVC','routing concept'],build:'迷你 MVC 架構',dev:'追 request 到 controller',test:'能解釋 MVC 各責任',pass:'不是只背名詞',fix:'畫 Request→Controller→Model→View',github:'week16/',ai:'可解釋架構'},
-{p:'Laravel',t:'W17｜Laravel 起步',topics:['install','Route','Controller','View','Migration','Eloquent'],build:'Laravel 基礎 CRUD',dev:'route list / log',test:'從 route 找到 controller',pass:'CRUD 可跑',fix:'手動追蹤每個 request',github:'week17/',ai:'允許 boilerplate'},
+{p:'Laravel',t:'W17｜Laravel 起步',topics:['install','Route','Controller','View','Migration','Eloquent'],build:'Laravel 單一資料表基礎 CRUD',dev:'route list / log',test:'從 route 找到 controller',pass:'CRUD 可跑',fix:'手動追蹤每個 request',github:'week17/',ai:'允許 boilerplate'},
 {p:'Laravel',t:'W18｜Validation、Relationship、專案選題檢查點',topics:['Form Request','one-to-many','Eloquent relationship','pagination','專案選題'],build:'關聯式 CRUD',dev:'查 SQL / log',test:'一對多功能',pass:'能解釋 relationship',fix:'先畫 ERD',github:'week18/',ai:'可協助設計，但題目由你決定'},
 {p:'Laravel',t:'W19｜Auth、Middleware、Authorization',topics:['Auth','Middleware','Policy/Gate 概念','權限'],build:'角色 / 權限限制',dev:'Network 觀察 401/403',test:'不同角色不同結果',pass:'懂 401 vs 403',fix:'列權限矩陣',github:'week19/',ai:'可協助安全檢查'},
 {p:'Laravel',t:'W20｜Laravel REST API',topics:['API routes','Resource','pagination','search','validation'],build:'完整 REST API',dev:'Network + JSON',test:'CRUD API + error response',pass:'前端可獨立接',fix:'逐 endpoint 測',github:'week20/',ai:'可生成測試資料'},
@@ -224,7 +229,7 @@ function weekStart(i){let d=new Date(start);d.setDate(d.getDate()+i*7);return d}
 function key(w,i){return 'ray-task-'+w+'-'+i}
 function buildTasks(w){
  const x=weeks[w-1];
- return ['閱讀/複習：'+x.topics.slice(0,2).join('、'),'必做實作：'+x.build,'DevTools：'+x.dev,'週五測驗：'+x.test,'GitHub：'+x.github];
+ return ['閱讀/複習：'+coreTopics(w-1).join('、'),'必做實作：'+x.build,'DevTools：'+x.dev,'單元驗收：'+x.test,'GitHub：'+x.github];
 }
 function renderWeeks(){
  const box=document.querySelector('#weekList'); box.innerHTML='';
@@ -241,10 +246,12 @@ function renderWeeks(){
   d.innerHTML=`
    <summary><div><b>${w.t}</b><div class="meta"><span class="pill">${w.p}</span><span class="pill">${weekRange(idx)}</span><span class="pill">${done}/${tasks.length}</span></div></div><span>＋</span></summary>
    <div class="week-body">
-    <div class="box"><h3>本週必學</h3><ul>${w.topics.map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+    <div class="box"><h3>核心必會</h3><ul>${coreTopics(idx).map(x=>'<li>'+x+'</li>').join('')}</ul></div>
+    <div class="box"><h3>延伸內容 · 核心通過後再做</h3><div>${esc(extensionTopics(idx))}</div></div>
+    <div class="box"><h3>累積式成果與緩衝</h3><div>${esc(unitGuidance(idx))}</div></div>
     <div class="box"><h3>必做小功能</h3><div>${w.build}</div></div>
     <div class="box"><h3>DevTools 任務</h3><div>${w.dev}</div></div>
-    <div class="box"><h3>週五測驗</h3><div>${w.test}</div></div>
+    <div class="box"><h3>單元驗收（週五回顧）</h3><div>${w.test}</div></div>
     <div class="box"><h3>及格標準</h3><div>${w.pass}</div></div>
     <div class="box"><h3>不及格補救</h3><div>${w.fix}</div></div>
     <div class="box"><h3>AI 規則</h3><div>${w.ai}</div></div>
@@ -301,21 +308,21 @@ function updateStats(){
  const pct=Math.round(done/total*100);
  ['overallPct','progressBig'].forEach(id=>document.getElementById(id).textContent=pct+'%');
  ['overallBar','progressBigBar'].forEach(id=>document.getElementById(id).style.width=pct+'%');
- const state=courseState(),cw=state.week;
+ const state=courseState(),cw=activeUnit();
  const tasks=state.before?prepTasks:buildTasks(cw);
  const wd=tasks.filter((_,i)=>safeRead(state.before?'ray-prep-'+i:key(cw,i))==='1').length;
- document.getElementById('weekNow').textContent=state.before?'準備期':state.after?'已結訓':'W'+cw;
- document.getElementById('weekDate').textContent=state.before?'距 10/06 開課還有 '+state.days+' 天':weekRange(cw-1);
+ document.getElementById('weekNow').textContent=state.before?'準備期':state.after?'已結訓':'W'+state.week;
+ document.getElementById('weekDate').textContent=state.before?'距 10/06 開課還有 '+state.days+' 天':weekRange(state.week-1);
  document.getElementById('phaseNow').textContent=state.before?'開課前準備':state.after?'成果整理與補強':weeks[cw-1].p;
  document.getElementById('focusText').textContent=state.before?'環境、時間與課表':state.after?'整理作品與補強弱項':weeks[cw-1].build;
  document.getElementById('weekPct').textContent=Math.round(wd/tasks.length*100)+'%';
  document.getElementById('weekCount').textContent=(state.before?'準備清單 ':'課程任務 ')+wd+' / '+tasks.length;
- renderToday();
+ renderToday();updateLearningPanel();
 }
 function renderToday(){
- const state=courseState(),cw=state.week,box=document.getElementById('todayTasks');
+ const state=courseState(),cw=activeUnit(),box=document.getElementById('todayTasks');
  const tasks=state.before?prepTasks:buildTasks(cw);
- box.innerHTML=(state.before?'<div class="callout"><b>正式課程尚未開始</b><br>10/06 起才進入 W1。現在的預習不會增加正式課程完成率；課前練習可以記在筆記中。</div>':'<div class="callout"><b>'+ (state.after?'結訓後檢查':'W'+cw+' 本週重點')+'</b><br>'+esc(weeks[cw-1].build)+'</div>')+
+ box.innerHTML=(state.before?'<div class="callout"><b>正式課程尚未開始</b><br>10/06 起才進入 W1。現在的預習不會增加正式課程完成率；課前練習可以記在筆記中。</div>':'<div class="callout"><b>'+ (state.after?'結訓後檢查':'U'+cw+' 學習單元')+'</b><br>'+esc(weeks[cw-1].build)+'</div>')+
  tasks.map((t,i)=>{const k=state.before?'ray-prep-'+i:key(cw,i);return '<label class="task"><input type="checkbox" data-current="'+k+'" '+(safeRead(k)==='1'?'checked':'')+'><span>'+esc(t)+'</span></label>'}).join('')+
  '<p style="color:var(--muted);margin:8px 0 0">勾選代表任務完成；測驗結果與作品證據請另記於「學習成果」。</p>';
  box.querySelectorAll('[data-current]').forEach(el=>el.onchange=()=>{save(el.dataset.current,el.checked?'1':'0');updateStats();renderWeeks()});
@@ -329,14 +336,15 @@ function renderOutcomes(){
  const fields=[['demo','作品 / Demo 連結','url'],['commit','Commit 連結','url'],['score','測驗分數（0–100，無分數可留白）','number'],['review','驗收結果','select'],['learned','我能獨立完成什麼','textarea'],['debug','遇到的錯誤與解決方式','textarea'],['next','下一步補強 / 老師實際授課進度','textarea']];
  document.getElementById('outcomeGrid').innerHTML=weeks.map((w,i)=>{
  const n=String(i+1).padStart(2,'0'),done=safeRead('ray-outcome-'+n)==='1';
- return '<article class="card outcome-card"><div><span class="pill">W'+(i+1)+'</span> <b>'+esc(w.t.split('｜')[1])+'</b></div><span style="color:var(--muted);font-size:14px">'+weekRange(i)+'</span><p style="margin:0">'+esc(w.build)+'</p><div class="box"><b>驗收標準</b><p style="margin:6px 0">'+esc(w.pass)+'</p></div><label class="task"><input type="checkbox" data-outcome="'+n+'" '+(done?'checked':'')+'><span>本週成果已 commit / push（自行確認）</span></label><details class="review"><summary>填寫作品與驗收紀錄</summary>'+fields.map(([f,label,type])=>{
+ return '<article class="card outcome-card"><div><span class="pill">W'+(i+1)+'</span> <b>'+esc(w.t.split('｜')[1])+'</b></div><span style="color:var(--muted);font-size:14px">'+weekRange(i)+'</span><p style="margin:0">'+esc(w.build)+'</p><div class="box"><b>驗收標準</b><p style="margin:6px 0">'+esc(w.pass)+'</p></div><label class="task"><input type="checkbox" data-outcome="'+n+'" '+(done?'checked':'')+'><span>本週成果已 commit / push（自行確認）</span></label><details class="review"><summary>填寫作品與驗收紀錄</summary>'+acceptanceFields(n)+fields.map(([f,label,type])=>{
  const k='ray-evidence-'+n+'-'+f,v=safeRead(k);
  let control=type==='textarea'?'<textarea data-record="'+k+'">'+esc(v)+'</textarea>':type==='select'?'<select data-record="'+k+'">'+[['','尚未驗收'],['practice','練習中'],['remediate','需補強'],['passed','已通過']].map(([a,b])=>'<option value="'+a+'" '+(v===a?'selected':'')+'>'+b+'</option>').join('')+'</select>':'<input type="'+type+'" '+(type==='number'?'min="0" max="100" step="1"':'placeholder="https://"')+' data-record="'+k+'" value="'+esc(v)+'">';
  return '<label class="field">'+label+control+'</label>';
  }).join('')+'</details><div class="links"><a class="btn secondary" target="_blank" rel="noopener" href="https://github.com/laypan/ray-learning-os/tree/main/learning/week'+n+'">成果資料夾</a><a class="btn secondary" target="_blank" rel="noopener" href="https://github.com/laypan/ray-learning-os/blob/main/learning/week'+n+'/README.md">README</a></div></article>';
  }).join('');
- document.querySelectorAll('[data-outcome]').forEach(el=>el.onchange=()=>save('ray-outcome-'+el.dataset.outcome,el.checked?'1':'0'));
- document.querySelectorAll('[data-record]').forEach(el=>el.oninput=()=>{if(el.type==='number'&&!el.checkValidity())return;save(el.dataset.record,el.value)});
+ document.querySelectorAll('[data-outcome]').forEach(el=>el.onchange=()=>{save('ray-outcome-'+el.dataset.outcome,el.checked?'1':'0');updateLearningPanel()});
+ document.querySelectorAll('[data-record]').forEach(el=>el.oninput=()=>{if(el.type==='number'&&!el.checkValidity())return;save(el.dataset.record,el.value);updateLearningPanel()});
+ document.querySelectorAll('[data-check]').forEach(el=>el.onchange=()=>{save(el.dataset.check,el.checked?'1':'0');updateLearningPanel()});
 }
 function exportBackup(){
  const data={};Object.keys(localStorage).filter(k=>k.startsWith('ray-')).forEach(k=>data[k]=localStorage.getItem(k));
@@ -351,7 +359,7 @@ document.getElementById('importData').onchange=async e=>{
   const obj=JSON.parse(await file.text());
   if(obj.app!=='ray-learning-os'||obj.version!==1||!obj.data||typeof obj.data!=='object'||Array.isArray(obj.data))throw Error('不是有效的學習備份');
   const entries=Object.entries(obj.data);
-  if(entries.some(([k,v])=>!/^ray-(task-|outcome-|notes$|prep-|skill-|evidence-)/.test(k)||typeof v!=='string'))throw Error('備份欄位格式不符');
+  if(entries.some(([k,v])=>!/^ray-(task-|outcome-|notes$|prep-|skill-|evidence-|learning-unit$|check-)/.test(k)||typeof v!=='string'))throw Error('備份欄位格式不符');
   if(!confirm('匯入將覆蓋備份中同名的紀錄，其餘紀錄保留。建議先匯出目前資料。繼續？'))return;
   for(const [k,v]of entries){if(!save(k,v))throw Error('儲存空間不足，部分資料可能已匯入');}
   document.getElementById('notesBox').value=safeRead('ray-notes');
@@ -359,6 +367,41 @@ document.getElementById('importData').onchange=async e=>{
  }catch(err){alert('匯入失敗：'+err.message)}finally{e.target.value=''}
 };
 document.getElementById('notesBox').oninput=e=>save('ray-notes',e.target.value);
+
+
+const coreCounts=[5,5,4,5,4,4,4,5,6,5,4,3,5,5,5,4,6,3,4,5,4,3,6,4,5,6];
+function coreTopics(i){return weeks[i].topics.slice(0,coreCounts[i]);}
+function extensionTopics(i){const rest=weeks[i].topics.slice(coreCounts[i]);return rest.length?rest.join('、'):'追加邊界案例、重構或不同解法；有餘力再做。'}
+function unitGuidance(i){
+ if(i===3)return '沿用購物車資料做搜尋與篩選；排序移為延伸。留一個時段複習函式與陣列，通過後再進 DOM。';
+ if(i===11)return '先能處理 PHP 表單與 GET/POST；PDO 連線列為延伸，U13 開始時先補齊 PDO 與輸入驗證，再做 CRUD。';
+ if(i===17)return '從既有練習挑選最終作品候選題，記錄使用者、核心流程與不做的功能；題目由你決定。';
+ if(i===19)return '將已有 API 放到測試環境跑通一條流程，先確認資料庫、環境設定與啟動方法。';
+ if(i===21)return '整合既有成果並完成測試部署；保留一個時段修阻礙主流程的問題，確定最終作品範圍。';
+ if(i===22)return '整理前面累積的需求、資料表與 API；沿用可用模組，不必從零重做整套專案。';
+ if(i===24)return '完成候選版本與部署演練，先修登入、權限及資料遺失風險。';
+ if(i===25)return '最後只有四天：以已部署版本做驗證、README、展示與回顧，不再增加核心功能。';
+ if([5,7,10,15].includes(i))return '階段檢查點：用獨立寫、改需求、找錯誤、口頭說明驗收；未通過先補強，延伸題可延期。';
+ return '延續既有作品或採用符合目標的老師作業；本週至少留一個時段補強，提交一個可檢查的小成果即可。';
+}
+function activeUnit(){const n=Number(safeRead('ray-learning-unit','1'));return Number.isInteger(n)&&n>=1&&n<=26?n:1;}
+const acceptanceLabels=['不看答案獨立完成核心題','能修改條件並確認結果','能找出並修正一個錯誤','能說明原因，隔天換題仍會'];
+function acceptanceFields(n){return '<div class="box"><b>能力驗收 · 完成後自行確認</b>'+acceptanceLabels.map((label,i)=>{const k='ray-check-'+n+'-'+i;return '<label class="task"><input type="checkbox" data-check="'+k+'" '+(safeRead(k)==='1'?'checked':'')+'><span>'+label+'</span></label>'}).join('')+'</div>';}
+function unitPassed(w){const n=String(w).padStart(2,'0');return safeRead('ray-evidence-'+n+'-review')==='passed'&&acceptanceLabels.every((_,i)=>safeRead('ray-check-'+n+'-'+i)==='1');}
+function validWebURL(s){try{return ['http:','https:'].includes(new URL(s).protocol)}catch{return false}}
+function unitSubmitted(w){const n=String(w).padStart(2,'0');return safeRead('ray-outcome-'+n)==='1'&&validWebURL(safeRead('ray-evidence-'+n+'-commit'));}
+function updateLearningPanel(){
+ const u=activeUnit(),state=courseState(),selector=document.getElementById('activeUnit');
+ selector.value=String(u);
+ document.getElementById('unitStatus').textContent=state.before?'目前是課前準備期。可預覽單元，正式學習仍從 10/06 開始。':'正在學習 U'+u+' · '+(unitPassed(u)?'能力驗收已通過':'尚未完成能力驗收')+'。'+(state.after?'結訓後仍可繼續補強。':'目前行事曆為 W'+state.week+'，不代表你必須學到 U'+state.week+'。');
+ document.getElementById('nextUnit').disabled=state.before||!unitPassed(u)||u===26;
+ document.getElementById('nextUnit').textContent=u===26?'已是最後單元':unitPassed(u)?'前往下一單元':'完成驗收後可前進';
+ document.getElementById('passedCount').textContent=weeks.filter((_,i)=>unitPassed(i+1)).length+' / 26';
+ document.getElementById('submittedCount').textContent=weeks.filter((_,i)=>unitSubmitted(i+1)).length+' / 26';
+}
+document.getElementById('activeUnit').innerHTML=weeks.map((w,i)=>'<option value="'+(i+1)+'">U'+(i+1)+' · '+esc(w.t.split('｜')[1])+'</option>').join('');
+document.getElementById('activeUnit').onchange=e=>{save('ray-learning-unit',e.target.value);updateStats()};
+document.getElementById('nextUnit').onclick=()=>{const u=activeUnit();if(!courseState().before&&unitPassed(u)&&u<26){save('ray-learning-unit',String(u+1));updateStats()}};
 
 renderWeeks();renderOutcomes();renderSkills();renderTools();updateStats();
 </script>
